@@ -3,7 +3,6 @@
 //
 
 #include <fstream>
-#include <stdexcept>
 #include <cmath>
 #include "STLWriter.h"
 
@@ -26,7 +25,7 @@ void STLWriter::Run() {
         _ostrm.write((char*)header, 80*sizeof(char));
 
         auto triangles = [this]() {
-            std::vector<Triangle> triangles;
+            std::vector<Triangle> vt;
             for (const auto& face: _is.f) {
                 for (auto i = 2u; i < face.size(); ++i) {
                     auto a = _is.v[std::get<0>(face[0])];
@@ -65,10 +64,10 @@ void STLWriter::Run() {
                         return n;
                     }(a, b, c);
 
-                    triangles.emplace_back(norm, a, b, c);
+                    vt.emplace_back(norm, a, b, c);
                 }                
             }
-            return triangles;
+            return vt;
         }();
 
         uint32_t cTriangles = triangles.size();

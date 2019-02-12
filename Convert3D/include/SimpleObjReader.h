@@ -5,10 +5,9 @@
 #pragma once
 
 #include <fstream>
-#include <map>
 #include "Types.h"
 
-using LineRef = std::vector<int>;
+using LineRef = std::vector<size_t>;
 
 class SimpleObjReader {
 public:

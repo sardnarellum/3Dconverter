@@ -2,11 +2,7 @@
 // Created by sardnarellum on 2019. 02. 09..
 //
 
-#include <algorithm>
-#include <iostream>
-#include <string>
 #include <sstream>
-#include <functional>
 #include <iterator>
 #include <tuple>
 #include <deque>
@@ -24,6 +20,7 @@ template<typename Out>
 void split(const std::string &s, char delim, Out result, bool skipEmptyElems = true) {
     std::stringstream ss(s);
     std::string item;
+
     while (std::getline(ss, item, delim)) {
         if (!skipEmptyElems || !item.empty()) {
             *(result++) = item;
@@ -38,7 +35,7 @@ void insert(Vertices& v, LineRef& lr, const std::string& x, const std::string& y
 
 size_t findHistoryReference(const LineRef& h, int rawIndex) {
     if (rawIndex >= 0) {
-        return rawIndex-1; // obj runs from 1
+        return static_cast<size_t>(rawIndex) - 1; // obj runs from 1
     }
 
     return h[h.size()+rawIndex];
@@ -52,10 +49,10 @@ void insert(Faces& faces, LineRef& lr, std::deque<std::string> refs) {
             split(e, '/', std::back_inserter(triplet), false);
 
             auto v = findHistoryReference(lr, std::stoi(triplet[0]));
-            auto vt = triplet[1].size() != 0
+            auto vt = !triplet[1].empty()
                     ? std::optional<size_t>(findHistoryReference(lr, std::stoi(triplet[1])))
                     : std::nullopt;
-            auto vn = triplet[2].size() != 0
+            auto vn = !triplet[2].empty()
                     ? std::optional<size_t>(findHistoryReference(lr, std::stoi(triplet[2])))
                     : std::nullopt;
             f.emplace_back(v, vt, vn);
@@ -78,21 +75,24 @@ void SimpleObjReader::Run() {
 
         while (std::getline(_is, line)) {
             const auto hashPos = line.find('#');
+
             if (std::string::npos != hashPos) {
                 line.erase(line.begin() + hashPos, line.end());
             }
+
             line = std::regex_replace(line, std::regex("^ +| +$|( ) +"), "$1");
-            if (0 < line.size()) {
+
+            if (!line.empty()) {
                 std::deque<std::string> elems;
                 split(line, ' ', std::back_inserter(elems));
 
-                if (0 == elems[0].compare("v")) {
+                if (elems[0] == "v") {
                     insert(_st.v, lr, elems[1], elems[2], elems[3]);
-                } else if (0 == elems[0].compare("vt")) {
+                } else if (elems[0] == "vt") {
                     insert(_st.vt, lr, elems[1], elems[2], elems[3]);
-                } else if (0 == elems[0].compare("vn")) {
+                } else if (elems[0] == "vn") {
                     insert(_st.vn, lr, elems[1], elems[2], elems[3]);
-                } else if (0 == elems[0].compare("f")) {
+                } else if (elems[0] == "f") {
                     elems.pop_front();
                     insert(_st.f, lr, elems);
                 }
