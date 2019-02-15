@@ -68,15 +68,12 @@ void insert(Faces& faces, LineRef& lr, std::deque<std::string> refs) {
 }
 
 void SimpleObjReader::Run() {
-    LineRef lr;
-
     if (_is.is_open()) {
+        LineRef lr;
         std::string line;
 
         while (std::getline(_is, line)) {
-            const auto hashPos = line.find('#');
-
-            if (std::string::npos != hashPos) {
+            if (const auto hashPos = line.find('#'); std::string::npos != hashPos) {
                 line.erase(line.begin() + hashPos, line.end());
             }
 
